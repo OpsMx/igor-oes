@@ -50,6 +50,7 @@ import com.netflix.spinnaker.igor.travis.client.model.v3.V3Build;
 import com.netflix.spinnaker.igor.travis.client.model.v3.V3Builds;
 import com.netflix.spinnaker.igor.travis.client.model.v3.V3Job;
 import com.netflix.spinnaker.igor.travis.client.model.v3.V3Log;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.core.SupplierUtils;
@@ -444,6 +445,20 @@ public class TravisService implements BuildOperations, BuildProperties {
         travisCache.setJobLog(groupKey, jobId, v3Log.getContent());
         return Optional.of(v3Log.getContent());
       }
+    } catch (SpinnakerServerException e) {
+      Map body = e.getResponseBody();
+      if (body != null) {
+        if ("log_expired".equals(body.get("error_type"))) {
+          log.info(
+              "{}: The log for job id {} has expired and the corresponding build was ignored",
+              groupKey,
+              jobId);
+        } else {
+          log.warn(
+              "{}: Could not get log for job id {}. Error from Travis:\n{}", groupKey, jobId, body);
+        }
+      }
+      log.warn("{}: Could not get log for job id {}. Error from Travis", groupKey, jobId, e);
     } catch (RetrofitError e) {
       if (e.getBody() != null) {
         try {
@@ -465,6 +480,7 @@ public class TravisService implements BuildOperations, BuildProperties {
         }
       }
     }
+
     return Optional.empty();
   }
 
@@ -553,7 +569,7 @@ public class TravisService implements BuildOperations, BuildProperties {
   public void syncRepos() {
     try {
       travisClient.usersSync(getAccessToken(), new EmptyObject());
-    } catch (RetrofitError e) {
+    } catch (SpinnakerServerException e) {
       log.error(
           "synchronizing travis repositories for {} failed with error: {}",
           groupKey,
