@@ -32,6 +32,9 @@ import com.netflix.spinnaker.igor.service.BuildProperties;
 import com.netflix.spinnaker.igor.travis.client.logparser.PropertyParser;
 import com.netflix.spinnaker.kork.core.RetrySupport;
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerNetworkException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -175,6 +178,19 @@ public class GitlabCiService implements BuildOperations, BuildProperties {
 
             return properties;
 
+          } catch (SpinnakerNetworkException e) {
+            throw e;
+          } catch (SpinnakerHttpException e) {
+            if (e.getResponseCode() == 404 || e.getResponseCode() >= 500) {
+              throw e;
+            }
+            SpinnakerException ex = new SpinnakerException(e);
+            ex.setRetryable(false);
+            throw ex;
+          } catch (SpinnakerServerException e) {
+            SpinnakerException ex = new SpinnakerException(e);
+            ex.setRetryable(false);
+            throw ex;
           } catch (RetrofitError e) {
             // retry on network issue, 404 and 5XX
             if (e.getKind() == RetrofitError.Kind.NETWORK

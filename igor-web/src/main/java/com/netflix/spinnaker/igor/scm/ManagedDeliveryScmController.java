@@ -16,6 +16,8 @@
 
 package com.netflix.spinnaker.igor.scm;
 
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +92,14 @@ public class ManagedDeliveryScmController {
         if (re.getKind() == RetrofitError.Kind.HTTP) {
           status = HttpStatus.valueOf(re.getResponse().getStatus());
           errorDetails = re.getBodyAs(Map.class);
+        } else {
+          errorDetails = "Error calling downstream system: " + re.getMessage();
+        }
+      } else if (e instanceof SpinnakerServerException) {
+        SpinnakerServerException re = (SpinnakerServerException) e;
+        if (re instanceof SpinnakerHttpException) {
+          status = HttpStatus.valueOf(((SpinnakerHttpException) re).getResponseCode());
+          errorDetails = re.getResponseBody();
         } else {
           errorDetails = "Error calling downstream system: " + re.getMessage();
         }
