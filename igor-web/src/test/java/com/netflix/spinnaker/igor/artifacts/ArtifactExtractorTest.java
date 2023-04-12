@@ -10,13 +10,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
+// @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Main.class)
 @TestPropertySource(properties = {"spring.application.name = igor"})
 public class ArtifactExtractorTest {
