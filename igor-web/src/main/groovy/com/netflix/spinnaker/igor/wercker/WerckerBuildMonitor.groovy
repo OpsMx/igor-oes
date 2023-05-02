@@ -136,15 +136,14 @@ class WerckerBuildMonitor extends CommonPollingMonitor<PipelineDelta, PipelinePo
      */
     private void processRuns( WerckerService werckerService, String master, String pipeline,
             List<PipelineDelta> delta, List<Run> runs) {
+        List<Run> allRuns = runs ?: werckerService.getBuilds(pipeline)
+        log.info "polling Wercker pipeline: ${pipeline} got ${allRuns.size()} runs"
+        if (allRuns.empty) {
+            log.debug("[{}:{}] has no runs skipping...", kv("master", master), kv("pipeline", pipeline))
+            return
+        }
+        Run lastStartedAt = getLastStartedAt(allRuns)
         try {
-            List<Run> allRuns = runs ?: werckerService.getBuilds(pipeline)
-            log.info "polling Wercker pipeline: ${pipeline} got ${allRuns.size()} runs"
-            if (allRuns.empty) {
-                log.debug("[{}:{}] has no runs skipping...", kv("master", master), kv("pipeline", pipeline))
-                return
-            }
-            Run lastStartedAt = getLastStartedAt(allRuns)
-
             Long cursor = cache.getLastPollCycleTimestamp(master, pipeline)
             //The last build/run
             Long lastBuildStamp = lastStartedAt.startedAt.getTime()
