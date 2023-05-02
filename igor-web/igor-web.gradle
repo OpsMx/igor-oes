@@ -102,7 +102,7 @@ dependencies {
     implementation "io.spinnaker.kork:kork-retrofit"
 
     runtimeOnly "io.spinnaker.kork:kork-runtime"
-
+    testImplementation "com.squareup.okhttp3:mockwebserver"
     testImplementation "com.squareup.okhttp:mockwebserver:2.7.5"
     testImplementation "io.spinnaker.kork:kork-jedis-test"
     testImplementation "org.codehaus.groovy:groovy-datetime"
