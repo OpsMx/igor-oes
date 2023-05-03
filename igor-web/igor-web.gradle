@@ -12,6 +12,7 @@ dependencies {
     implementation project(":igor-monitor-artifactory")
     implementation project(":igor-monitor-plugins")
     implementation project(":igor-monitor-travis")
+<<<<<<< HEAD
     implementation "io.spinnaker.kork:kork-retrofit"
 
     implementation platform("io.spinnaker.kork:kork-bom:$korkVersion"){
@@ -27,6 +28,15 @@ dependencies {
     }
     testAnnotationProcessor "org.projectlombok:lombok"
     implementation "io.spinnaker.kork:kork-retrofit"
+=======
+
+    implementation platform("io.spinnaker.kork:kork-bom:$korkVersion")
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor platform("io.spinnaker.kork:kork-bom:$korkVersion")
+    annotationProcessor "org.projectlombok:lombok"
+    testAnnotationProcessor platform("io.spinnaker.kork:kork-bom:$korkVersion")
+    testAnnotationProcessor "org.projectlombok:lombok"
+>>>>>>> foramtted code
 
     runtimeOnly "org.springframework.boot:spring-boot-properties-migrator"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
@@ -52,13 +62,20 @@ dependencies {
     testImplementation "org.hamcrest:hamcrest-core"
     testRuntimeOnly "cglib:cglib-nodep"
     testRuntimeOnly "org.objenesis:objenesis"
+<<<<<<< HEAD
     implementation "org.codehaus.groovy:groovy"
+=======
+>>>>>>> foramtted code
 
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-core"
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
+<<<<<<< HEAD
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+=======
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+>>>>>>> foramtted code
 
     implementation "com.squareup.retrofit:retrofit"
     implementation "com.squareup.retrofit:converter-jackson"
@@ -75,6 +92,7 @@ dependencies {
     implementation "org.springframework.cloud:spring-cloud-context"
     implementation "org.springframework.cloud:spring-cloud-config-server"
 
+<<<<<<< HEAD
   implementation("com.amazonaws:aws-java-sdk:1.12.411") {
     exclude group: "io.netty", module: "netty-codec-http"
   }
@@ -93,6 +111,24 @@ dependencies {
 
 
   implementation "io.github.resilience4j:resilience4j-retry"
+=======
+    implementation ("com.amazonaws:aws-java-sdk:1.12.411"){
+      exclude group: "io.netty", module: "netty-codec-http"
+    }
+    implementation "com.google.apis:google-api-services-cloudbuild:v1-rev836-1.25.0"
+    implementation "com.google.apis:google-api-services-storage:v1-rev141-1.25.0"
+    implementation 'com.google.auth:google-auth-library-oauth2-http'
+    implementation "io.spinnaker.kork:kork-config"
+    implementation "io.spinnaker.kork:kork-cloud-config-server"
+    implementation "io.spinnaker.kork:kork-artifacts"
+    implementation "io.spinnaker.kork:kork-exceptions"
+    implementation "io.spinnaker.kork:kork-web"
+    implementation "io.spinnaker.kork:kork-jedis"
+    implementation "io.spinnaker.kork:kork-telemetry"
+    implementation "io.spinnaker.kork:kork-plugins"
+
+    implementation "io.github.resilience4j:resilience4j-retry"
+>>>>>>> foramtted code
 
   implementation "io.projectreactor:reactor-core"
   implementation "com.google.code.gson:gson"
