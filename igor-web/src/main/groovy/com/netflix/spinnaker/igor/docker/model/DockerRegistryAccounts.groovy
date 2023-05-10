@@ -17,6 +17,7 @@
 package com.netflix.spinnaker.igor.docker.model
 
 import com.netflix.spinnaker.igor.docker.service.ClouddriverService
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,6 +41,8 @@ class DockerRegistryAccounts {
                     service.getAccountDetails(it)
                 }
             }
+        } catch (SpinnakerServerException e) {
+          log.error "Failed to get list of docker accounts", e
         } catch (RetrofitError e) {
             log.error "Failed to get list of docker accounts", e
         }
