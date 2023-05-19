@@ -18,10 +18,12 @@ package com.netflix.spinnaker.igor.scm.stash.client
 
 import com.netflix.spinnaker.igor.scm.AbstractScmMaster
 import com.netflix.spinnaker.igor.scm.stash.client.model.TextLinesResponse
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerNetworkException
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import groovy.util.logging.Slf4j
 import retrofit.RetrofitError
-
 /**
  * Wrapper class for a collection of Stash clients
  */
@@ -35,6 +37,14 @@ class StashMaster extends AbstractScmMaster {
   List<String> listDirectory(String projectKey, String repositorySlug, String path, String ref) {
     try {
       return stashClient.listDirectory(projectKey, repositorySlug, path, ref).toChildFilenames()
+    } catch (SpinnakerNetworkException e) {
+      throw new NotFoundException("Could not find the server ${master.baseUrl}")
+    } catch (SpinnakerHttpException | SpinnakerServerException e ) {
+      log.error(
+              "Failed to fetch file from {}/{}/{}, reason: {}",
+              projectKey, repositorySlug, path, e.message
+      )
+      throw e
     } catch (RetrofitError e) {
       if (e.getKind() == RetrofitError.Kind.NETWORK) {
         throw new NotFoundException("Could not find the server ${baseUrl}")
@@ -61,7 +71,15 @@ class StashMaster extends AbstractScmMaster {
         contents += response.toTextContents() + "\n"
       }
       return contents
-    } catch (RetrofitError e) {
+    } catch (SpinnakerNetworkException e) {
+      throw new NotFoundException("Could not find the server ${master.baseUrl}")
+    } catch (SpinnakerHttpException | SpinnakerServerException e) {
+      log.error(
+              "Failed to fetch file from {}/{}/{}, reason: {}",
+              projectKey, repositorySlug, path, e.message
+      )
+      throw e
+    }catch (RetrofitError e) {
       if (e.getKind() == RetrofitError.Kind.NETWORK) {
         throw new NotFoundException("Could not find the server ${baseUrl}")
       }

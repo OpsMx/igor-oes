@@ -10,23 +10,16 @@ package com.netflix.spinnaker.igor.wercker
 
 import com.netflix.spinnaker.fiat.model.resources.Permissions
 import com.netflix.spinnaker.igor.build.BuildController
-import com.netflix.spinnaker.igor.build.model.GenericBuild
-import com.netflix.spinnaker.igor.build.model.GenericGitRevision
-import com.netflix.spinnaker.igor.build.model.GenericJobConfiguration
-import com.netflix.spinnaker.igor.build.model.JobConfiguration
-import com.netflix.spinnaker.igor.build.model.Result
+import com.netflix.spinnaker.igor.build.model.*
 import com.netflix.spinnaker.igor.config.WerckerProperties.WerckerHost
 import com.netflix.spinnaker.igor.exceptions.BuildJobError
 import com.netflix.spinnaker.igor.model.BuildServiceProvider
 import com.netflix.spinnaker.igor.service.BuildOperations
-import com.netflix.spinnaker.igor.wercker.model.Application
-import com.netflix.spinnaker.igor.wercker.model.Pipeline
-import com.netflix.spinnaker.igor.wercker.model.QualifiedPipelineName
-import com.netflix.spinnaker.igor.wercker.model.Run
-import com.netflix.spinnaker.igor.wercker.model.RunPayload
+import com.netflix.spinnaker.igor.wercker.model.*
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException
 import groovy.util.logging.Slf4j
+import okhttp3.Response
 import retrofit.RetrofitError
-import retrofit.client.Response
 import retrofit.mime.TypedByteArray
 
 import static com.netflix.spinnaker.igor.model.BuildServiceProvider.WERCKER
@@ -171,6 +164,15 @@ class WerckerService implements BuildOperations {
 
                 //return the integer build number for this run id
                 return runIdBuildNumbers.get(run.id)
+            }catch ( SpinnakerServerException e) {
+                def body = e.getResponseBody()
+                String wkrMsg
+                if(body != null){
+                    wkrMsg = body.toString()
+                 }
+                log.error("Failed to trigger build for pipeline {}. {}", kv("pipelineName", pipelineName), kv("errMsg", wkrMsg))
+                throw new BuildJobError(
+                        "Failed to trigger build for pipeline ${pipelineName}! Error from Wercker is: ${wkrMsg}")
             } catch (RetrofitError e) {
                 def body = e.getResponse().getBody()
                 String wkrMsg
@@ -203,6 +205,8 @@ class WerckerService implements BuildOperations {
                     it.type + QualifiedPipelineName.SPLITOR +
                         new QualifiedPipelineName(app.owner.name, app.name, it.name).toString()
                 } )
+            } catch(SpinnakerServerException exception) {
+                log.error "Error getting pipelines for ${app.owner.name } ${app.name} ${exception}"
             } catch(retrofit.RetrofitError err) {
                 log.error "Error getting pipelines for ${app.owner.name } ${app.name} ${err}"
             }
@@ -279,6 +283,8 @@ class WerckerService implements BuildOperations {
                     pipelineId = matchingPipeline.id
                     cache.setPipelineID(groupKey, appAndPipelineName, pipelineId)
                 }
+            }catch(SpinnakerServerException exception) {
+                log.info "Error getting pipelines for ${qPipeline.ownerName} ${qPipeline.appName} ${exception} ${exception.getClass()}"
             } catch(retrofit.RetrofitError err) {
                 log.info "Error getting pipelines for ${qPipeline.ownerName} ${qPipeline.appName} ${err} ${err.getClass()}"
             }
@@ -299,7 +305,9 @@ class WerckerService implements BuildOperations {
                         .toString()
                     cache.setPipelineID(groupKey, name, pipelineId)
                 }
-            } catch(retrofit.RetrofitError err) {
+            } catch(SpinnakerServerException exception) {
+                log.info "Error getting pipelines for ${owner} ${appName} ${exception} ${exception.getClass()}"
+            }catch(retrofit.RetrofitError err) {
                 log.info "Error getting pipelines for ${owner} ${appName} ${err} ${err.getClass()}"
             }
         }
