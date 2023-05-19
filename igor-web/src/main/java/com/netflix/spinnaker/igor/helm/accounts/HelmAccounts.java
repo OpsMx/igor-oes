@@ -19,6 +19,7 @@ package com.netflix.spinnaker.igor.helm.accounts;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.netflix.spinnaker.igor.helm.model.HelmIndex;
+import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +63,8 @@ public class HelmAccounts {
               .filter(it -> it.types.contains("helm/chart"))
               .map(it -> new HelmAccount(it.name))
               .collect(Collectors.toList());
+    } catch (SpinnakerException e) {
+      log.error("Failed to get list of Helm accounts", e);
     } catch (RetrofitError e) {
       log.error("Failed to get list of Helm accounts", e);
     }
