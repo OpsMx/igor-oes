@@ -63,7 +63,7 @@ public class HelmAccounts {
               .filter(it -> it.types.contains("helm/chart"))
               .map(it -> new HelmAccount(it.name))
               .collect(Collectors.toList());
-    } catch (SpinnakerException e) {
+    } catch (SpinnakerServerException e) {
       log.error("Failed to get list of Helm accounts", e);
     } catch (RetrofitError e) {
       log.error("Failed to get list of Helm accounts", e);
