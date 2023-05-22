@@ -44,6 +44,9 @@ import com.netflix.spinnaker.igor.service.BuildOperations;
 import com.netflix.spinnaker.igor.service.BuildProperties;
 import com.netflix.spinnaker.kork.core.RetrySupport;
 import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerNetworkException;
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerServerException;
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -215,6 +218,16 @@ public class JenkinsService implements BuildOperations, BuildProperties {
         () -> {
           try {
             return jenkinsClient.getGitDetails(encode(jobName), buildNumber);
+          } catch (SpinnakerServerException e) {
+            // assuming that a conversion error is unlikely to succeed on retry
+            if (e instanceof SpinnakerConversionException) {
+              log.warn(
+                  "Unable to deserialize git details for build " + buildNumber + " of " + jobName,
+                  e);
+              return null;
+            } else {
+              throw e;
+            }
           } catch (RetrofitError e) {
             // assuming that a conversion error is unlikely to succeed on retry
             if (e.getKind() == RetrofitError.Kind.CONVERSION) {
@@ -240,6 +253,13 @@ public class JenkinsService implements BuildOperations, BuildProperties {
   public QueuedJob queuedBuild(String master, int item) {
     try {
       return circuitBreaker.executeSupplier(() -> jenkinsClient.getQueuedItem(item));
+    } catch (SpinnakerServerException e) {
+      if (e instanceof SpinnakerHttpException
+          && ((SpinnakerHttpException) e).getResponseCode() == NOT_FOUND.value()) {
+        throw new NotFoundException(
+            String.format("Queued job '%s' not found for master '%s'.", item, master));
+      }
+      throw e;
     } catch (RetrofitError e) {
       if (e.getResponse() != null && e.getResponse().getStatus() == NOT_FOUND.value()) {
         throw new NotFoundException(
@@ -331,6 +351,19 @@ public class JenkinsService implements BuildOperations, BuildProperties {
         () -> {
           try {
             return jenkinsClient.getPropertyFile(encode(jobName), buildNumber, fileName);
+          } catch (SpinnakerNetworkException e) {
+            throw e;
+          } catch (SpinnakerHttpException e) {
+            if (e.getResponseCode() == 404 || e.getResponseCode() >= 500) {
+              throw e;
+            }
+            SpinnakerException ex = new SpinnakerException(e);
+            ex.setRetryable(false);
+            throw ex;
+          } catch (SpinnakerServerException e) {
+            SpinnakerException ex = new SpinnakerException(e);
+            ex.setRetryable(false);
+            throw ex;
           } catch (RetrofitError e) {
             // retry on network issue, 404 and 5XX
             if (e.getKind() == RetrofitError.Kind.NETWORK
