@@ -11,8 +11,10 @@ env:
   CONTAINER_REGISTRY: quay.io/opsmxpublic
 
 jobs:
-  branch-build:
-    runs-on: ubuntu-latest    
+  branch-build-igor:
+    runs-on: ubuntu-latest   
+    outputs:
+      igor: ${{ steps.get-build-name.outputs.igor }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -77,3 +79,29 @@ jobs:
           push: true
           tags: |
             "${{ env.CONTAINER_REGISTRY }}/${{ steps.build_variables.outputs.REPO }}:${{ steps.build_variables.outputs.VERSION }}-dev"            
+      - id: get-build-name
+        run: |
+            imageName=${{ env.CONTAINER_REGISTRY }}/${{ steps.build_variables.outputs.REPO }}:${{ steps.build_variables.outputs.VERSION }}
+            echo "igor=$imageName" >> $GITHUB_OUTPUT
+  outputs:
+    runs-on: ubuntu-latest
+    needs: [branch-build-igor]
+    steps:
+    - name: Che4ck out repository code
+      uses: actions/checkout@v3
+      with:
+        repository: opsmx/cve-target
+        ref: refs/heads/main
+    - run: | 
+        
+          echo artifactId: ${{ needs.branch-build-igor.outputs.igor }} > default/service-settings/igor.yml
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "updating master Branch images into service settings"
+          git push --force
+          git push https://yugaa22:$GITHUB_TOKEN@github.com/opsmx/cve-target.git # This does not work either
+      env:
+         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}   
+            
+            
