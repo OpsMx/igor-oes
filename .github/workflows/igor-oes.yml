@@ -101,9 +101,8 @@ jobs:
           git add .
           git status
           git commit -m "updating master Branch images into service settings"
-          git pull
-         
-          git push https://yugaa22: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@github.com/opsmx/cve-target.git --force
+          git pull       
+          git push https://yugaa22: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@github.com/opsmx/cve-target.git --force
       env:
          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}   
 
