@@ -95,12 +95,14 @@ jobs:
     - run: | 
         
           echo artifactId: ${{ needs.branch-build-igor.outputs.igor }} > default/service-settings/igor.yml
+          cat default/service-settings/igor.yml
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
+          git status
           git commit -m "updating master Branch images into service settings"
           git push --force
-          git push https://yugaa22:$GITHUB_TOKEN@github.com/opsmx/cve-target.git # This does not work either
+          git push https://yugaa22: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@github.com/opsmx/cve-target.git 
       env:
          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}   
             
