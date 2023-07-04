@@ -84,8 +84,7 @@ jobs:
             imageName=${{ env.CONTAINER_REGISTRY }}/${{ steps.build_variables.outputs.REPO }}:${{ steps.build_variables.outputs.VERSION }}
             echo "igor=$imageName" >> $GITHUB_OUTPUT
             
-  call-cve-targer-igor:
-    uses: opsmx/cve-target/.github/workflows/igor.yml@main         
+
             
             
             
