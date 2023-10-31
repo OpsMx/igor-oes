@@ -71,7 +71,7 @@ jobs:
           build-args: |
             CUSTOMPLUGIN_RELEASEORG=aman-agrawal
             CUSTOMPLUGIN_RELEASEREPO=armory-observability-plugin
-            CUSTOMPLUGIN_RELEASEVERSION=v1.0
+            CUSTOMPLUGIN_RELEASEVERSION=v1.2
           context: .
           file: docker/ubi8/Dockerfile-dev-armory
           push: true
