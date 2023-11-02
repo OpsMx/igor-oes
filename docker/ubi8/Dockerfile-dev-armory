@@ -47,7 +47,7 @@ ENV CUSTOMPLUGIN_RELEASEREPO=$CUSTOMPLUGIN_RELEASEREPO
 ARG CUSTOMPLUGIN_RELEASEVERSION
 ENV CUSTOMPLUGIN_RELEASEVERSION=$CUSTOMPLUGIN_RELEASEVERSION
 
-RUN wget -O Armory.armory-observability-plugin-$CUSTOMPLUGIN_RELEASEVERSION-SNAPSHOT.zip -c https://github.com/$CUSTOMPLUGIN_RELEASEORG/$CUSTOMPLUGIN_RELEASEREPO/releases/download/$CUSTOMPLUGIN_RELEASEVERSION/armory-observability-plugin-v1.4.2.1-SNAPSHOT.zip -P /opt/igor/plugins 
+RUN wget -O Armory.armory-observability-plugin-$CUSTOMPLUGIN_RELEASEVERSION-SNAPSHOT.zip -c https://github.com/$CUSTOMPLUGIN_RELEASEORG/$CUSTOMPLUGIN_RELEASEREPO/releases/download/$CUSTOMPLUGIN_RELEASEVERSION/armory-observability-plugin-$CUSTOMPLUGIN_RELEASEVERSION.zip -P /opt/igor/plugins 
 RUN mv Armory.armory-observability-plugin-$CUSTOMPLUGIN_RELEASEVERSION-SNAPSHOT.zip /opt/igor/plugins/
 
 RUN chmod -R 777 /opt/igor/plugins/
