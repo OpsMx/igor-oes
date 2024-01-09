@@ -66,6 +66,8 @@ dependencies {
   implementation "org.springframework.security:spring-security-web"
   implementation "org.springframework.cloud:spring-cloud-context"
   implementation "org.springframework.cloud:spring-cloud-config-server"
+  implementation "software.amazon.awssdk:s3:2.22.12"
+  implementation "software.amazon.awssdk:secretsmanager:2.22.12"
 
   implementation ("com.amazonaws:aws-java-sdk:1.12.411"){
     exclude group: "io.netty", module: "netty-codec-http"
