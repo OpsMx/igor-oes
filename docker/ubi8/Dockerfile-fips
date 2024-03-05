@@ -48,7 +48,7 @@ RUN wget -O Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASEVERSION}-SN
 RUN mv Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASEVERSION}-SNAPSHOT.zip /opt/igor/plugins/
 RUN chmod -R 777 /opt/igor/plugins/
 RUN chown -R spinnaker:spinnaker /opt/
-RUN yum -y remove  tar  vim
+RUN yum -y remove  tar  vim vi
 RUN yum -y remove clean all && rm -rf /var/cache
 USER spinnaker
 CMD ["/opt/igor/bin/igor"]
