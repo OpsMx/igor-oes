@@ -91,10 +91,13 @@ dependencies {
   implementation "com.google.guava:guava"
   implementation "javax.inject:javax.inject:1"
   implementation "jakarta.validation:jakarta.validation-api:3.0.2"
-  testImplementation "com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations:2.15.0"
   implementation("io.netty:netty-codec-http:4.1.86.Final"){
     force=true}
+
+  implementation "com.squareup.okio:okio-jvm"
+
   testImplementation("io.netty:netty-codec-http:4.1.86.Final"){force=true}
+  testImplementation "com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations:2.15.0"
   runtimeOnly "io.spinnaker.kork:kork-runtime"
 
   testImplementation "com.squareup.okhttp:mockwebserver:2.7.5"
@@ -110,13 +113,6 @@ dependencies {
   testImplementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
   testImplementation "jakarta.activation:jakarta.activation-api:2.1.0"
   testImplementation "org.springframework.cloud:spring-cloud-config-server"
-  implementation "com.squareup.okio:okio-jvm:3.2.0"
-//    testImplementation "javax.xml.bind:jaxb-api:2.3.1"
-//    testImplementation "com.sun.xml.bind:jaxb-core:4.0.0"
-//    testImplementation "com.sun.xml.bind:jaxb-impl:4.0.0"
-//    testImplementation "javax.activation:activation"
-//    testImplementation "jakarta.activation:jakarta.activation-api:2.1.0"
-//    testImplementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.0"
 }
 
 tasks.withType(Tar) {
