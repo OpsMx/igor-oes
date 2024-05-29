@@ -4,7 +4,7 @@ on:
   workflow_call:
   push:
     branches:
-    - OES-1.30.1
+    - OES-1.33.x
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Xmx6g -Xms6g
@@ -12,7 +12,7 @@ env:
 
 jobs:
   branch-build-igor:
-    runs-on: ubuntu-latest   
+    runs-on: ubuntu-latest
     outputs:
       igor: ${{ steps.get-build-name.outputs.igor }}
     steps:
@@ -32,8 +32,8 @@ jobs:
         id: build_variables
         run: |
           echo ::set-output name=REPO::ubi8-igor-cve
-          #echo ::set-output name=VERSION::"1.30.1$(date --utc +'%Y%m%d')"
-          #echo ::set-output name=VERSION::"1.30.1$(date --utc +'%-m%d')"
+          #echo ::set-output name=VERSION::"1.33.x$(date --utc +'%Y%m%d')"
+          #echo ::set-output name=VERSION::"1.33.x$(date --utc +'%-m%d')"
           echo ::set-output name=VERSION::"1.30.1"
           echo "::set-output name=GITHASH::$(git rev-parse --short HEAD)"
           echo "::set-output name=BUILDDATE::$(date -u +"%Y%m%d%H%M")"
@@ -48,31 +48,31 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_version: ${{ steps.build_variables.outputs.VERSION }}
         run: |
-        
-        
+
+
           sed  -e 's/NEXUS_USERNAME/${{ secrets.NEXUS_USERNAME }}/' -i settings.gradle
           sed  -e 's/NEXUS_PASSWORD/${{ secrets.NEXUS_PASSWORD }}/' -i settings.gradle
           sed  -e 's/NEXUS_USERNAME/${{ secrets.NEXUS_USERNAME }}/' -i build.gradle
           sed  -e 's/NEXUS_PASSWORD/${{ secrets.NEXUS_PASSWORD }}/' -i build.gradle
-                  
-            ./gradlew --no-daemon -PenableCrossCompilerPlugin=true igor-web:installDist -x test 
-            
+
+            ./gradlew --no-daemon -PenableCrossCompilerPlugin=true igor-web:installDist -x test
+
             #extra_opts='"--add-opens=java.base/sun.net=ALL-UNNAMED" "--add-exports=java.base/sun.net=ALL-UNNAMED" "--add-opens=java.base/java.time=ALL-UNNAMED"'
-            
-            
+
+
             extra_opts='"-Djava.security.egd=file:/dev/./urandom" "-Dspring.config.import=optional:/opt/spinnaker/config/" "--add-opens=java.base/sun.net=ALL-UNNAMED" "--add-exports=java.base/sun.net=ALL-UNNAMED" "--add-opens=java.base/java.time=ALL-UNNAMED"'
 
             extra_opts_escaped=$(sed 's/[\/&]/\\&/g' <<< "$extra_opts")
-              
-            echo $extra_opts_escaped
-            
-            #sed "s/^\(DEFAULT_JVM_OPTS=\'.*\)\'$/\1 $extra_opts_escaped\'/" -i igor-web/build/install/igor/bin/igor               
-            
 
-                sed "s/^\(DEFAULT_JVM_OPTS\)\s*=\s*'.*'\$/\1='$extra_opts_escaped'/" -i  igor-web/build/install/igor/bin/igor 
+            echo $extra_opts_escaped
+
+            #sed "s/^\(DEFAULT_JVM_OPTS=\'.*\)\'$/\1 $extra_opts_escaped\'/" -i igor-web/build/install/igor/bin/igor
+
+
+                sed "s/^\(DEFAULT_JVM_OPTS\)\s*=\s*'.*'\$/\1='$extra_opts_escaped'/" -i  igor-web/build/install/igor/bin/igor
 
             cat igor-web/build/install/igor/bin/igor
-              
+
       - name: dockerBuildpush
         uses: docker/build-push-action@v2
         with:
@@ -85,7 +85,7 @@ jobs:
           push: true
           tags: |
             "${{ env.CONTAINER_REGISTRY }}/${{ steps.build_variables.outputs.REPO }}:${{ steps.build_variables.outputs.VERSION }}-${{ steps.build_variables.outputs.GITHASH }}-${{ steps.build_variables.outputs.BUILDDATE }}"
-    
+
       - name: dockerBuildpushdev
         uses: docker/build-push-action@v2
         with:
@@ -98,15 +98,15 @@ jobs:
           push: true
           tags: |
             "${{ env.CONTAINER_REGISTRY }}/${{ steps.build_variables.outputs.REPO }}:${{ steps.build_variables.outputs.VERSION }}-${{ steps.build_variables.outputs.GITHASH }}-${{ steps.build_variables.outputs.BUILDDATE }}-dev"
-    
+
       - id: get-build-name
         run: |
             imageName="${{ env.CONTAINER_REGISTRY }}/${{ steps.build_variables.outputs.REPO }}:${{ steps.build_variables.outputs.VERSION }}-${{ steps.build_variables.outputs.GITHASH }}-${{ steps.build_variables.outputs.BUILDDATE }}"
-    
-            echo "igor=$imageName" >> $GITHUB_OUTPUT
-            
 
-            
-            
-            
-  
+            echo "igor=$imageName" >> $GITHUB_OUTPUT
+
+
+
+
+
+
