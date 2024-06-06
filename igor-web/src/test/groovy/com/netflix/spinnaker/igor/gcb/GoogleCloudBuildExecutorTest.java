@@ -23,7 +23,10 @@ import static org.mockito.Mockito.when;
 import com.google.api.client.json.GenericJson;
 import com.google.api.services.cloudbuild.v1.CloudBuildRequest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class GoogleCloudBuildExecutorTest {
   private GoogleCloudBuildExecutor executor = new GoogleCloudBuildExecutor();
 

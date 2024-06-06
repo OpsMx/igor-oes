@@ -31,6 +31,7 @@ import com.netflix.spinnaker.igor.service.BuildOperations
 import com.netflix.spinnaker.igor.service.BuildProperties
 import com.netflix.spinnaker.igor.service.BuildServices
 import com.netflix.spinnaker.kork.artifacts.model.Artifact
+import com.netflix.spinnaker.kork.retrofit.exceptions.SpinnakerHttpException
 import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
 import com.netflix.spinnaker.security.AuthenticatedRequest
@@ -45,7 +46,6 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.HandlerMapping
-import retrofit.RetrofitError
 import retrofit.http.Query
 
 import javax.annotation.Nullable
@@ -107,12 +107,36 @@ class BuildController {
     return jobStatus(buildService, master, job, buildNumber)
   }
 
+  @RequestMapping(value = '/builds/status/{buildNumber}/{master}')
+  @PreAuthorize("hasPermission(#master, 'BUILD_SERVICE', 'READ')")
+  GenericBuild getJobStatus(
+    @PathVariable String master,
+    @PathVariable Integer buildNumber,
+    @RequestParam("job") String job) {
+    def buildService = getBuildService(master)
+    return jobStatus(buildService, master, job, buildNumber)
+  }
+
   @RequestMapping(value = '/builds/artifacts/{buildNumber}/{master:.+}/**')
   @PreAuthorize("hasPermission(#master, 'BUILD_SERVICE', 'READ')")
   List<Artifact> getBuildResults(@PathVariable String master, @PathVariable
     Integer buildNumber, @Query("propertyFile") String propertyFile, HttpServletRequest request) {
     def job = ((String) request.getAttribute(
       HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).split('/').drop(5).join('/')
+    def buildService = getBuildService(master)
+    GenericBuild build = jobStatus(buildService, master, job, buildNumber)
+    if (build && buildService instanceof BuildProperties && artifactExtractor != null) {
+      build.properties = buildService.getBuildProperties(job, build, propertyFile)
+      return artifactExtractor.extractArtifacts(build)
+    }
+    return Collections.emptyList()
+  }
+
+
+  @RequestMapping(value = '/builds/artifacts/{buildNumber}/{master}')
+  @PreAuthorize("hasPermission(#master, 'BUILD_SERVICE', 'READ')")
+  List<Artifact> getBuildResults(@PathVariable String master, @PathVariable
+    Integer buildNumber, @RequestParam("job") String job ,@Query("propertyFile") String propertyFile) {
     def buildService = getBuildService(master)
     GenericBuild build = jobStatus(buildService, master, job, buildNumber)
     if (build && buildService instanceof BuildProperties && artifactExtractor != null) {
@@ -178,8 +202,8 @@ class BuildController {
           if (buildService.metaClass.respondsTo(buildService, 'stopQueuedBuild')) {
             buildService.stopQueuedBuild(queuedBuild)
           }
-        } catch (RetrofitError e) {
-          if (e.response?.status != NOT_FOUND.value()) {
+        } catch (SpinnakerHttpException e) {
+          if (e.getResponseCode() != NOT_FOUND.value()) {
             throw e
           }
         }
@@ -318,6 +342,22 @@ class BuildController {
       String fileName, HttpServletRequest request) {
     def job = ((String) request.getAttribute(
       HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).split('/').drop(6).join('/')
+    def buildService = getBuildService(master)
+    if (buildService instanceof BuildProperties) {
+      BuildProperties buildProperties = (BuildProperties) buildService
+      def genericBuild = buildService.getGenericBuild(job, buildNumber)
+      return buildProperties.getBuildProperties(job, genericBuild, fileName)
+    }
+    return Collections.emptyMap()
+  }
+
+
+  @RequestMapping(value = '/builds/properties/{buildNumber}/{fileName}/{master}')
+  @PreAuthorize("hasPermission(#master, 'BUILD_SERVICE', 'READ')")
+  Map<String, Object> getProperties(
+    @PathVariable String master,
+    @PathVariable Integer buildNumber, @PathVariable
+      String fileName, @RequestParam("job") String job) {
     def buildService = getBuildService(master)
     if (buildService instanceof BuildProperties) {
       BuildProperties buildProperties = (BuildProperties) buildService

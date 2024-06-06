@@ -13,10 +13,6 @@ import com.netflix.spinnaker.kork.dynamicconfig.DynamicConfigService
 import com.netflix.spinnaker.security.AuthenticatedRequest
 import org.springframework.scheduling.TaskScheduler
 
-import static com.netflix.spinnaker.igor.wercker.model.Run.finishedAtComparator
-import static com.netflix.spinnaker.igor.wercker.model.Run.startedAtComparator
-import static net.logstash.logback.argument.StructuredArguments.kv
-
 import com.netflix.spectator.api.Registry
 import com.netflix.spinnaker.igor.IgorConfigurationProperties
 import com.netflix.spinnaker.igor.build.model.GenericBuild
@@ -34,9 +30,7 @@ import com.netflix.spinnaker.igor.polling.PollContext
 import com.netflix.spinnaker.igor.polling.PollingDelta
 import com.netflix.spinnaker.igor.service.BuildServices
 import com.netflix.spinnaker.igor.wercker.model.Run
-
 import groovy.time.TimeCategory
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -44,10 +38,9 @@ import org.springframework.stereotype.Service
 
 import java.util.stream.Collectors
 
-import javax.annotation.PreDestroy
-
-import retrofit.RetrofitError
-
+import static com.netflix.spinnaker.igor.wercker.model.Run.finishedAtComparator
+import static com.netflix.spinnaker.igor.wercker.model.Run.startedAtComparator
+import static net.logstash.logback.argument.StructuredArguments.kv
 /**
  * Monitors new wercker runs
  */
@@ -154,7 +147,7 @@ class WerckerBuildMonitor extends CommonPollingMonitor<PipelineDelta, PipelinePo
             Long cursor = cache.getLastPollCycleTimestamp(master, pipeline)
             //The last build/run
             Long lastBuildStamp = lastStartedAt.startedAt.getTime()
-            def upperBound     = lastStartedAt.startedAt
+            Date upperBound     = lastStartedAt.startedAt
             if (cursor == lastBuildStamp) {
                 log.debug("[${master}:${pipeline}] is up to date. skipping")
                 return
@@ -187,11 +180,7 @@ class WerckerBuildMonitor extends CommonPollingMonitor<PipelineDelta, PipelinePo
                     runningBuilds: currentlyBuilding
                     ))
         } catch (e) {
-            log.error("Error processing runs for [{}:{}]", kv("master", master), kv("pipeline", pipeline), e)
-            if (e.cause instanceof RetrofitError) {
-                def re = (RetrofitError) e.cause
-                log.error("Error communicating with Wercker for [{}:{}]: {}", kv("master", master), kv("pipeline", pipeline), kv("url", re.url), re)
-            }
+          log.error("Error processing runs for [{}:{}]", kv("master", master), kv("pipeline", pipeline), e)
         }
     }
 

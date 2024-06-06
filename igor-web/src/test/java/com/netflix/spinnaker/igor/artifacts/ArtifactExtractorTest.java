@@ -10,16 +10,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-// @RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Main.class)
 @TestPropertySource(properties = {"spring.application.name = igor"})
 public class ArtifactExtractorTest {
 
-  @Autowired ArtifactExtractor artifactExtractor;
+  @Autowired private ArtifactExtractor artifactExtractor;
 
   @Test
   public void should_be_able_to_serialize_jsr310_dates() {
