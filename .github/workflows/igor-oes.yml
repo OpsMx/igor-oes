@@ -49,7 +49,7 @@ jobs:
           ORG_GRADLE_PROJECT_version: ${{ steps.build_variables.outputs.VERSION }}
         run: |
 
-          sed  -e 's/NEXUS_URL/${{ secrets.NEXUS_URL }}/'  -i settings.gradle
+          sed  -e 's/NEXUS_URL/${{ secrets.NEXUS_URL }}/g' -i settings.gradle
           sed  -e 's/NEXUS_USERNAME/${{ secrets.NEXUS_USERNAME }}/' -i settings.gradle
           sed  -e 's/NEXUS_PASSWORD/${{ secrets.NEXUS_PASSWORD }}/' -i settings.gradle
           sed  -e 's/NEXUS_USERNAME/${{ secrets.NEXUS_USERNAME }}/' -i build.gradle
