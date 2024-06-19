@@ -40,8 +40,8 @@ ENV CUSTOMPLUGIN_RELEASEORG=$CUSTOMPLUGIN_RELEASEORG
 ARG CUSTOMPLUGIN_RELEASEREPO
 ENV CUSTOMPLUGIN_RELEASEREPO=$CUSTOMPLUGIN_RELEASEREPO
 
-RUN wget -O Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASE_VERSION}.zip -c https://github.com/${CUSTOMPLUGIN_RELEASEORG}/${CUSTOMPLUGIN_RELEASEREPO}/releases/download/v${CUSTOMPLUGIN_RELEASE_VERSION}/armory-observability-plugin-v${CUSTOMPLUGIN_RELEASE_VERSION}.zip -P /opt/orca/plugins
-RUN mv Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASE_VERSION}.zip /opt/orca/plugins/
+RUN wget -O Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASE_VERSION}.zip -c https://github.com/${CUSTOMPLUGIN_RELEASEORG}/${CUSTOMPLUGIN_RELEASEREPO}/releases/download/v${CUSTOMPLUGIN_RELEASE_VERSION}/armory-observability-plugin-v${CUSTOMPLUGIN_RELEASE_VERSION}.zip -P /opt/igor/plugins
+RUN mv Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASE_VERSION}.zip /opt/igor/plugins/
 
 RUN chmod -R 777 /opt/igor/plugins/
 RUN chown -R spinnaker:spinnaker /opt/
