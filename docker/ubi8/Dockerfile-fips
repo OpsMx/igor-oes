@@ -21,6 +21,7 @@ ENV JAVA_HOME=/opsmx-java-runtime \
     PATH=${PATH}:/opsmx-java-runtime/bin \
     WORK_DIR=/opsmx/workdir \
     CONF_DIR=/opsmx/conf
+ENV SERVICE_PLUGIN_PATH=/opt/igor/plugins
 
 # Enabling fips mode
 RUN fips-mode-setup --enable
@@ -32,7 +33,7 @@ RUN update-crypto-policies --set FIPS
 RUN yum -y install wget
 COPY igor-web/build/install/igor /opt/igor
 RUN adduser spinnaker
-RUN mkdir -p /opt/igor/plugins
+RUN mkdir -p ${SERVICE_PLUGIN_PATH}
 
 #custom plugin zip files adding
 ARG CUSTOMPLUGIN_RELEASEORG
@@ -42,10 +43,10 @@ ENV CUSTOMPLUGIN_RELEASEREPO=$CUSTOMPLUGIN_RELEASEREPO
 ARG CUSTOMPLUGIN_RELEASE_VERSION
 ENV CUSTOMPLUGIN_RELEASE_VERSION=$CUSTOMPLUGIN_RELEASE_VERSION
 
-RUN wget -O Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASE_VERSION}.zip -c https://github.com/${CUSTOMPLUGIN_RELEASEORG}/${CUSTOMPLUGIN_RELEASEREPO}/releases/download/v${CUSTOMPLUGIN_RELEASE_VERSION}/armory-observability-plugin-v${CUSTOMPLUGIN_RELEASE_VERSION}.zip -P /opt/igor/plugins
-RUN mv Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASE_VERSION}.zip /opt/igor/plugins/
+RUN wget -O Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASE_VERSION}.zip -c https://github.com/${CUSTOMPLUGIN_RELEASEORG}/${CUSTOMPLUGIN_RELEASEREPO}/releases/download/v${CUSTOMPLUGIN_RELEASE_VERSION}/armory-observability-plugin-v${CUSTOMPLUGIN_RELEASE_VERSION}.zip -P ${SERVICE_PLUGIN_PATH}
+RUN mv Armory.armory-observability-plugin-${CUSTOMPLUGIN_RELEASE_VERSION}.zip ${SERVICE_PLUGIN_PATH}
 
-RUN chmod -R 777 /opt/igor/plugins/
+RUN chmod -R 777 ${SERVICE_PLUGIN_PATH}/
 RUN chown -R spinnaker:spinnaker /opt/
 RUN yum -y remove  tar  vim vi
 RUN yum -y remove clean all && rm -rf /var/cache
