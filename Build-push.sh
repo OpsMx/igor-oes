@@ -29,13 +29,6 @@ export DOCKER_REPO_NAME="opsmx11"
 # The Current Build ID 
 echo "Build id is --------------------- $BUILD_ID"
 
-
-echo "CUSTOMPLUGIN_RELEASEORG=${CUSTOMPLUGIN_RELEASEORG}"
-
-
-   echo "CUSTOMPLUGIN_RELEASEORG=$CUSTOMPLUGIN_RELEASEORG"
-
-   exit 0
    
 
 # Gradle command  to Produce the Dependant targetfiles for Docker build
