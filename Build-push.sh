@@ -53,4 +53,4 @@ echo "Build id is --------------------- $BUILD_ID"
 
 # Quay Image Name as Artifact
 #echo \"Igor\": \"${IMAGENAME}\" > file.properties;
-echo "image: ${IMAGENAME}" > spinnakerfile.properties
+echo "image=${IMAGENAME}" > spinnakerfile.properties
