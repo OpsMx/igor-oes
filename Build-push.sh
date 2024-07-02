@@ -26,7 +26,7 @@ export DOCKER_REPO_NAME="opsmx11"
 echo "Build id is --------------------- $BUILD_ID"
 
 # Gradle command  to Produce the Dependant targetfiles for Docker build
-./gradlew --no-daemon igor-web:installDist -x test
+ ./gradlew --no-daemon -PenableCrossCompilerPlugin=true igor-web:installDist -x test
 
    # Assigning Rhel Image Name according to Quay.io Details
    IMAGENAME="${QUAY_REPO_NAME}/${SERVICE_NAME}:${GITHASH}-${BUILD_NUMBER}"
