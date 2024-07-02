@@ -18,6 +18,10 @@ export BUILDDATE=`date -u +"%Y%m%d%H%M"`
 
 # For Assiging the Gradle Resources
 export GRADLE_OPTS="-Xmx6g -Xms6g"
+export CUSTOMPLUGIN_RELEASEVERSION=4.0.4.2-rc5
+export CUSTOMPLUGIN_RELEASEORG=opsmx
+export CUSTOMPLUGIN_RELEASEREPO=armory-observability-plugin
+export CUSTOMPLUGIN_RELEASE_VERSION=1.0.1
 export SERVICE_NAME="ubi8-spin-igor"
 export QUAY_REPO_NAME="quay.io/opsmxpublic"
 export DOCKER_REPO_NAME="opsmx11"
