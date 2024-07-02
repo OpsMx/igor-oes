@@ -29,6 +29,15 @@ export DOCKER_REPO_NAME="opsmx11"
 # The Current Build ID 
 echo "Build id is --------------------- $BUILD_ID"
 
+
+echo "CUSTOMPLUGIN_RELEASEORG=${CUSTOMPLUGIN_RELEASEORG}"
+
+
+   echo "CUSTOMPLUGIN_RELEASEORG=$CUSTOMPLUGIN_RELEASEORG"
+
+   exit 0
+   
+
 # Gradle command  to Produce the Dependant targetfiles for Docker build
  ./gradlew --no-daemon -PenableCrossCompilerPlugin=true igor-web:installDist -x test
 
@@ -37,9 +46,11 @@ echo "Build id is --------------------- $BUILD_ID"
    
    # Assigning Rhel Image Name according to Docker.io Details
    RELEASE_IMAGENAME="${DOCKER_REPO_NAME}/${SERVICE_NAME}:${GITHASH}-${BUILD_NUMBER}"  
+
+   
    
    # To Build Docker image with Given Docker File
-   docker build -t $IMAGENAME -t $RELEASE_IMAGENAME .  -f  ${DOCKERFILE_PATH} --no-cache  --build-arg CUSTOMPLUGIN_RELEASEORG=${CUSTOMPLUGIN_RELEASEORG} --build-arg CUSTOMPLUGIN_RELEASEREPO=${CUSTOMPLUGIN_RELEASEREPO} --build-arg CUSTOMPLUGIN_RELEASE_VERSION=${CUSTOMPLUGIN_RELEASE_VERSION} 
+   docker build -t $IMAGENAME -t $RELEASE_IMAGENAME .  -f  ${DOCKERFILE_PATH} --no-cache  --build-arg CUSTOMPLUGIN_RELEASEORG="${CUSTOMPLUGIN_RELEASEORG}" --build-arg CUSTOMPLUGIN_RELEASEREPO="${CUSTOMPLUGIN_RELEASEREPO}" --build-arg CUSTOMPLUGIN_RELEASEVERSION="${CUSTOMPLUGIN_RELEASEVERSION}" 
    
    # Quay.io login
    docker login -u $quay_user -p $quay_pass quay.io
