@@ -5,8 +5,7 @@ git --version
 docker --version
 
 # To Run Gradale Build need to have Java Vesion 1.11.+
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/bin/java
 # Setting JAVA_HOME to System PATH
 export PATH=$PATH:$JAVA_HOME
 
