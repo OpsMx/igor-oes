@@ -49,7 +49,7 @@ echo "Build id is --------------------- $BUILD_ID"
    # To Push the Docker image into Docker.io
    docker push $RELEASE_IMAGENAME
    
-   echo "Igor: ${IMAGENAME}"
+   echo "image=${IMAGENAME}" 
 
 # Quay Image Name as Artifact
 #echo \"Igor\": \"${IMAGENAME}\" > file.properties;
